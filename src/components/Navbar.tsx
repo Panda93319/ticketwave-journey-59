@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserCircle, LogOut } from 'lucide-react';
+import { UserCircle, LogOut, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { 
@@ -55,43 +55,39 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center">
-            {/* Navigation Links */}
-            {/* <nav className="flex items-center space-x-6">
-              <Link to="/" className="text-white hover:text-pink-300 transition-colors duration-200">
-                Home
-              </Link>
-              <Link to="/about" className="text-white hover:text-pink-300 transition-colors duration-200">
-                About
-              </Link>
-              <Link to="/merchandise" className="text-white hover:text-pink-300 transition-colors duration-200">
-                Merchandise
-              </Link>
-              <Link to="/tickets" className="text-white hover:text-pink-300 transition-colors duration-200">
-                Get Pass
-              </Link>
-              {user && (
-                <Link to="/pass" className="text-white hover:text-pink-300 transition-colors duration-200">
-                  Pass
-                </Link>
-              )}
-            </nav> */}
-
-            {/* Auth button */}
+            {/* Authentication */}
             <div className="ml-6">
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger className="text-white hover:text-gray-300 transition-colors duration-200 flex items-center focus:outline-none">
-                    <UserCircle className="h-6 w-6 text-pink-300" />
-                    <span className="max-w-[80px] sm:max-w-[120px] ml-1 truncate hidden sm:inline">{user.email}</span>
+                    <UserCircle className={cn("h-6 w-6", user.isAdmin ? "text-yellow-300" : "text-pink-300")} />
+                    <span className="max-w-[80px] sm:max-w-[120px] ml-1 truncate hidden sm:inline">
+                      {user.name || user.email}
+                      {user.isAdmin && <span className="ml-1 text-yellow-300">(Admin)</span>}
+                    </span>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 glass-card bg-black/80 text-white border-pink-500/20">
-                    <DropdownMenuItem asChild className="hover:bg-white/10">
-                      <Link to="/pass" className="cursor-pointer focus:bg-white/10">Pass Card</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="hover:bg-white/10">
-                      <Link to="/my-tickets" className="cursor-pointer focus:bg-white/10">My Tickets</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-white/20" />
+                    {user.isAdmin ? (
+                      <>
+                        <DropdownMenuItem asChild className="hover:bg-white/10">
+                          <Link to="/admin/dashboard" className="cursor-pointer focus:bg-white/10">
+                            <LayoutDashboard className="mr-2 h-4 w-4 text-yellow-300" />
+                            Admin Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/20" />
+                      </>
+                    ) : (
+                      <>
+                        <DropdownMenuItem asChild className="hover:bg-white/10">
+                          <Link to="/pass" className="cursor-pointer focus:bg-white/10">Pass Card</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="hover:bg-white/10">
+                          <Link to="/dashboard" className="cursor-pointer focus:bg-white/10">Dashboard</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/20" />
+                      </>
+                    )}
                     <DropdownMenuItem onClick={handleSignOut} className="text-pink-300 hover:bg-white/10 focus:text-pink-300">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign Out</span>
@@ -99,13 +95,22 @@ const Navbar = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link 
-                  to="/login" 
-                  className="text-white hover:text-gray-300 transition-colors duration-200 flex items-center"
-                >
-                  <UserCircle className="h-5 w-5 text-pink-300" />
-                  <span className="ml-1 hidden sm:inline">Sign In</span>
-                </Link>
+                <div className="flex items-center gap-4">
+                  <Link 
+                    to="/login" 
+                    className="text-white hover:text-gray-300 transition-colors duration-200 flex items-center"
+                  >
+                    <UserCircle className="h-5 w-5 text-pink-300" />
+                    <span className="ml-1 hidden sm:inline">Sign In</span>
+                  </Link>
+                  <Link 
+                    to="/admin/login" 
+                    className="text-white hover:text-gray-300 transition-colors duration-200 flex items-center"
+                  >
+                    <LayoutDashboard className="h-5 w-5 text-yellow-300" />
+                    <span className="ml-1 hidden sm:inline">Admin</span>
+                  </Link>
+                </div>
               )}
             </div>
           </div>

@@ -13,6 +13,9 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
 import PassCard from "./pages/PassCard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminRegister from "./pages/AdminRegister";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +31,25 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          
+          {/* Admin routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route 
+            path="/admin/register" 
+            element={
+              <ProtectedRoute requireAuth={true} requireAdmin={true}>
+                <AdminRegister />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/dashboard" 
+            element={
+              <ProtectedRoute requireAuth={true} requireAdmin={true}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* Protected routes */}
           <Route 

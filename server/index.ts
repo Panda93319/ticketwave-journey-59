@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { Pool } from 'pg';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
+import adminRoutes from './routes/admin';
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +35,7 @@ app.get('/api/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

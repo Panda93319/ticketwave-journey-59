@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
   requireAuth?: boolean;
   requireVerified?: boolean;
   requireTicket?: boolean;
+  requireAdmin?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
@@ -15,6 +16,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requireVerified = false,
   requireTicket = false,
+  requireAdmin = false,
 }) => {
   const { user, loading, isAuthenticated } = useAuth();
   const location = useLocation();
@@ -41,6 +43,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // User authenticated and email verified but doesn't have ticket when ticket is required
   if (requireTicket && user && user.isEmailVerified && !user.hasTicket) {
     return <Navigate to="/tickets" replace />;
+  }
+
+  // User authenticated but not an admin when admin is required
+  if (requireAdmin && user && !user.isAdmin) {
+    return <Navigate to="/admin/login" replace />;
   }
 
   return <>{children}</>;

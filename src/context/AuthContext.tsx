@@ -12,6 +12,7 @@ interface User {
   name?: string;
   isEmailVerified: boolean;
   hasTicket?: boolean;
+  isAdmin?: boolean;
 }
 
 interface AuthState {
@@ -33,6 +34,8 @@ type AuthContextType = {
   resendVerificationEmail: (email: string) => Promise<void>;
   verifyEmail: (token: string) => Promise<string | null>;
   getRedirectPath: () => string;
+  adminLogin: (email: string, password: string) => Promise<string | null>;
+  adminRegister: (name: string, email: string, password: string, adminSecret: string) => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -117,6 +120,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading: false,
       }));
       toast.error(error.response?.data?.message || 'Login failed');
+      return null;
+    }
+  };
+  
+  // Admin Login
+  const adminLogin = async (email: string, password: string): Promise<string | null> => {
+    try {
+      const res = await api.post('/admin/login', { email, password });
+      
+      localStorage.setItem('token', res.data.token);
+      setAuthState({
+        token: res.data.token,
+        user: res.data.user,
+        loading: false,
+        error: null,
+      });
+      
+      toast.success('Admin login successful!');
+      return res.data.redirectTo || '/admin/dashboard';
+    } catch (error: any) {
+      setAuthState(prev => ({
+        ...prev,
+        error: error.response?.data?.message || 'Admin login failed',
+        loading: false,
+      }));
+      toast.error(error.response?.data?.message || 'Admin login failed');
+      return null;
+    }
+  };
+  
+  // Admin Register
+  const adminRegister = async (
+    name: string, 
+    email: string, 
+    password: string, 
+    adminSecret: string
+  ): Promise<string | null> => {
+    try {
+      const res = await api.post('/admin/register', { name, email, password, adminSecret });
+      
+      localStorage.setItem('token', res.data.token);
+      setAuthState({
+        token: res.data.token,
+        user: res.data.user,
+        loading: false,
+        error: null,
+      });
+      
+      toast.success('Admin registration successful!');
+      return '/admin/dashboard';
+    } catch (error: any) {
+      setAuthState(prev => ({
+        ...prev,
+        error: error.response?.data?.message || 'Admin registration failed',
+        loading: false,
+      }));
+      toast.error(error.response?.data?.message || 'Admin registration failed');
       return null;
     }
   };
@@ -224,6 +284,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Determine redirect path based on user state
   const getRedirectPath = (): string => {
     if (!authState.user) return '/login';
+    if (authState.user.isAdmin) return '/admin/dashboard';
     if (!authState.user.isEmailVerified) return '/verify-email';
     if (!authState.user.hasTicket) return '/tickets';
     return '/';
@@ -241,7 +302,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       appleSignIn,
       resendVerificationEmail,
       verifyEmail,
-      getRedirectPath
+      getRedirectPath,
+      adminLogin,
+      adminRegister
     }}>
       {children}
     </AuthContext.Provider>

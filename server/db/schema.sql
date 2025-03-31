@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   is_email_verified BOOLEAN DEFAULT FALSE,
+  is_admin BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -68,3 +69,9 @@ INSERT INTO products (name, description, price) VALUES
   ('Vinyl Record', 'Limited edition vinyl record', 40.00),
   ('Snapback Hat', 'Tour logo snapback hat', 30.00),
   ('VIP Wristband', 'Exclusive VIP access wristband', 15.00);
+
+-- Insert admin user
+INSERT INTO users (name, email, password, is_email_verified, is_admin) 
+VALUES ('Admin', 'admin@sounduoex.com', '$2b$10$VJxRZG.ZM0HXSMtuuDIbI.ihQ/JRdUAC1xBlB17/WzgbOa9N5zKca', TRUE, TRUE) 
+ON CONFLICT (email) DO NOTHING;
+-- Note: The password is 'admin123' hashed with bcrypt
